@@ -9,9 +9,11 @@ import tkinter.messagebox as mb
 
 global firstCoords  # create global variable for first button location
 global simps  # create global variable for battle simps (battleships)
+global overlap # create a global variable to check if things overlap
 # initialise variables with values so we can easily check if its the first point of the ship/simp or the second point
 firstCoords = [-1, -1]
 simps = [5, 4, 3, 3, 2]  # the ships/simps and their lengths
+overlap = False
 
 
 def firstButtonPress(x, y):
@@ -79,41 +81,101 @@ def lastButtonPress(x, y):
 def firstCoordsLeft(x, y):
     print("in firstCoordsLeft function")
     global firstCoords
+    global overlap
     # distance between the two and is less than 0 so has to be converted to a positive
     distance = -(firstCoords[0] - x)
-    for i in range(distance-1):  # loop the distance
-        x -= 1
-        yourGrid[x][y].configure(bg="blue")  # set blue
+    tempx = x
+    for i in range(distance-1):  # loop the distance and check if any of the things would overlap without colouring them and if they do set Overlap to True
+        tempx -= 1
+        if(yourGrid[tempx][y].cget("bg") == "blue"):
+            overlap = True
+
+    if (overlap == False): # if overlap == False 
+        for i in range(distance-1):  # loop the distance
+            x -= 1
+            yourGrid[x][y].configure(bg="blue")  # set blue
+    else:
+        mb.showerror(
+            "Error", "You can't do this your ships would be overlapping")
+        yourGrid[firstCoords[0]][firstCoords[1]].configure(bg="white")
+        yourGrid[x][y].configure(bg="white")
+    overlap = False
 
 
 def firstCoordsAbove(x, y):
     print("in firstCoordsAbove function")
     global firstCoords
+    global overlap
     # distance between the two and is less than 0 so has to be converted to a positive
     distance = -(firstCoords[1] - y)
-    for i in range(distance-1):  # loop the distance
-        y -= 1
-        yourGrid[x][y].configure(bg="blue")  # set blue
-
-
-def firstCoordsRight(x, y):
-    print("in firstCoordsRight function")
-    global firstCoords
-    # distance between the two and is greater than 0 :)
-    distance = firstCoords[0] - x
-    for i in range(distance-1):  # loop the distance
-        x += 1
-        yourGrid[x][y].configure(bg="blue")  # set blue
+    tempy = y
+    for i in range(distance-1):  # loop the distance and check if any of the things would overlap without colouring them and if they do set Overlap to True
+        tempy -= 1
+        if(yourGrid[x][tempy].cget("bg") == "blue"):
+            overlap = True
+    
+    if (overlap == False):  # if overlap == False
+        for i in range(distance-1):  # loop the distance
+            y -= 1
+            yourGrid[x][y].configure(bg="blue")  # set blue
+    
+    else:
+        mb.showerror(
+            "Error", "You can't do this your ships would be overlapping")
+        yourGrid[firstCoords[0]][firstCoords[1]].configure(bg="white")
+        yourGrid[x][y].configure(bg="white")
+    overlap = False
 
 
 def firstCoordsBelow(x, y):
     print("in firstCoordsBelow function")
     global firstCoords
+    global overlap
     # distance between the two and is greater than 0 :)
     distance = firstCoords[1] - y
+    tempy = y
     for i in range(distance-1):  # loop the distance
-        y += 1
-        yourGrid[x][y].configure(bg="blue")  # set blue
+        tempy += 1
+        if(yourGrid[x][tempy].cget("bg") == "blue"):
+            overlap = True
+
+    if (overlap == False):  # if overlap == False
+        for i in range(distance-1):  # loop the distance
+            y += 1
+            yourGrid[x][y].configure(bg="blue")  # set blue
+
+    else:
+        mb.showerror(
+            "Error", "You can't do this your ships would be overlapping")
+        yourGrid[firstCoords[0]][firstCoords[1]].configure(bg="white")
+        yourGrid[x][y].configure(bg="white")
+    overlap = False
+
+
+def firstCoordsRight(x, y):
+    print("in firstCoordsRight function")
+    global firstCoords
+    global overlap
+    # distance between the two and is greater than 0 :)
+    distance = firstCoords[0] - x
+    tempx = x
+    for i in range(distance-1):  # loop the distance
+        tempx += 1
+        if(yourGrid[tempx][y].cget("bg") == "blue"):
+            overlap = True
+    
+    if (overlap == False):  # if overlap == False
+        for i in range(distance-1):  # loop the distance
+            x += 1
+            yourGrid[x][y].configure(bg="blue")  # set blue
+
+    else:
+        mb.showerror(
+            "Error", "You can't do this your ships would be overlapping")
+        yourGrid[firstCoords[0]][firstCoords[1]].configure(bg="white")
+        yourGrid[x][y].configure(bg="white")
+    overlap = False
+
 
 
 # Window creation etc
