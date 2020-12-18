@@ -8,17 +8,14 @@ import tkinter.messagebox as mb
 # Main user logic
 
 global firstCoords  # create global variable for first button location
-global lastCoords  # create global variable for second button location
 global simps  # create global variable for battle simps (battleships)
 # initialise variables with values so we can easily check if its the first point of the ship/simp or the second point
 firstCoords = [-1, -1]
-lastCoords = [-1, -1]  # read above
 simps = [5, 4, 3, 3, 2]  # the ships/simps and their lengths
 
 
 def firstButtonPress(x, y):
     global firstCoords
-    print("wow")
     if (len(simps) > 0):
         # if we select a square thats already blue this will error out with an error box
         if (yourGrid[x][y].cget("bg") == "blue"):
@@ -32,29 +29,91 @@ def firstButtonPress(x, y):
 
 def lastButtonPress(x, y):
     global firstCoords
-    print("such magic")
-    if (firstCoords[0] == x and firstCoords[1]==y): # if in same place as first press
-        yourGrid[firstCoords[0]][firstCoords[1]].configure(bg="white") # set to white as otherwise ship would be 1 long which is impossible
-        firstCoords = [-1, -1] # reset firstCoords to prevent issues
+    if (firstCoords[0] == x and firstCoords[1] == y):  # if in same place as first press
+        # set to white as otherwise ship would be 1 long which is impossible
+        yourGrid[firstCoords[0]][firstCoords[1]].configure(bg="white")
+        firstCoords = [-1, -1]  # reset firstCoords to prevent issues
 
-    elif (yourGrid[x][y].cget("bg") == "blue"): # if spot already blue then prevent ship being placed as overlapping
+    # if spot already blue then prevent ship being placed as overlapping
+    elif (yourGrid[x][y].cget("bg") == "blue"):
         mb.showerror(
             "Error", "You can't do this your ships would be overlapping")
         yourGrid[firstCoords[0]][firstCoords[1]].configure(bg="white")
         firstCoords = [-1, -1]
 
-    elif (firstCoords[0] == x): # if on same x coord as first button press good
-        yourGrid[x][y].configure(bg="blue") # set blue
-        firstCoords = [-1, -1] # reset firstCoords to allow for new ship
-
-    elif (firstCoords[1] == y):
-        yourGrid[x][y].configure(bg="blue")
+    elif (firstCoords[0] == x):  # if on same x coord as first button press good
+        # since its on the same x coord we need to look at the y length and coords
+        # if its less than 5 and greater than 0 its a valid simp with firstCoords below
+        if (firstCoords[1] - y < 5 and firstCoords[1] - y > 0):
+            yourGrid[x][y].configure(bg="blue")  # set blue
+            firstCoordsBelow(x, y)
+        # elif its greater than -5 and less than 0 then its a valid simp with firstCoords above
+        elif (firstCoords[1] - y > -5 and firstCoords[1] - y < 0):
+            yourGrid[x][y].configure(bg="blue")  # set blue
+            firstCoordsAbove(x, y)
+        else:  # it's more than 5 so we need to reset the firstcoords to white
+            yourGrid[firstCoords[0]][firstCoords[1]].configure(bg="white")
+        # reset firstCoords to allow for new ship no matter what
         firstCoords = [-1, -1]
 
-    else: # else diagonally
+    elif (firstCoords[1] == y):  # if on same y coord as first button that was pressed
+        # since its on the same y coord we need to look at the x length and coords
+        # if its less than 5 and greater than 0 its a valid simp with firstCoords on the right
+        if (firstCoords[0] - x < 5 and firstCoords[0] - x > 0):
+            yourGrid[x][y].configure(bg="blue")  # set blue
+            firstCoordsRight(x, y)
+        # elif its greater than -5 and less than 0 then its a valid simp with firstCoords on the left
+        elif (firstCoords[0] - x > -5 and firstCoords[0] - x < 0):
+            yourGrid[x][y].configure(bg="blue")  # set blue
+            firstCoordsLeft(x, y)
+        else:  # it's more than 5 so we need to reset the firstcoords to white
+            yourGrid[firstCoords[0]][firstCoords[1]].configure(bg="white")
+        firstCoords = [-1, -1]  # always reset the firstCoords!
+
+    else:  # else diagonally
         mb.showerror("Error", "You can't place simps diagonally!")
         yourGrid[firstCoords[0]][firstCoords[1]].configure(bg="white")
         firstCoords = [-1, -1]
+
+
+def firstCoordsLeft(x, y):
+    print("in firstCoordsLeft function")
+    global firstCoords
+    # distance between the two and is less than 0 so has to be converted to a positive
+    distance = -(firstCoords[0] - x)
+    for i in range(distance-1):  # loop the distance
+        x -= 1
+        yourGrid[x][y].configure(bg="blue")  # set blue
+
+
+def firstCoordsAbove(x, y):
+    print("in firstCoordsAbove function")
+    global firstCoords
+    # distance between the two and is less than 0 so has to be converted to a positive
+    distance = -(firstCoords[1] - y)
+    for i in range(distance-1):  # loop the distance
+        y -= 1
+        yourGrid[x][y].configure(bg="blue")  # set blue
+
+
+def firstCoordsRight(x, y):
+    print("in firstCoordsRight function")
+    global firstCoords
+    # distance between the two and is greater than 0 :)
+    distance = firstCoords[0] - x
+    for i in range(distance-1):  # loop the distance
+        x += 1
+        yourGrid[x][y].configure(bg="blue")  # set blue
+
+
+def firstCoordsBelow(x, y):
+    print("in firstCoordsBelow function")
+    global firstCoords
+    # distance between the two and is greater than 0 :)
+    distance = firstCoords[1] - y
+    for i in range(distance-1):  # loop the distance
+        y += 1
+        yourGrid[x][y].configure(bg="blue")  # set blue
 
 
 # Window creation etc
