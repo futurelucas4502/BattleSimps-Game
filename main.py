@@ -1,19 +1,17 @@
-from tkinter import *  # importing a gui library
+from tkinter import *  # importing the gui library
 import tkinter.messagebox as mb
-
-# sadly this code is incomplete due to the fact i have to leave in less than 15 mins ill probably be gone by the time u read this
-# this is v1 so very messy
-# a v2 will be made after v1 is finished as it was fun to make XD
 
 # Main user logic
 
 global firstCoords  # create global variable for first button location
-global simps  # create global variable for battle simps (battleships)
+global simps  # create global variable for battle simps
 global overlap # create a global variable to check if things overlap
-# initialise variables with values so we can easily check if its the first point of the ship/simp or the second point
+global bIsSimpAvaliable
+# initialise variables with values so we can easily check if its the first point of the simp or the second point
 firstCoords = [-1, -1]
-simps = [5, 4, 3, 3, 2]  # the ships/simps and their lengths
+simps = [5, 4, 3, 3, 2]  # the simps and their lengths
 overlap = False
+bIsSimpAvaliable = False
 
 
 def firstButtonPress(x, y):
@@ -22,24 +20,24 @@ def firstButtonPress(x, y):
         # if we select a square thats already blue this will error out with an error box
         if (yourGrid[x][y].cget("bg") == "blue"):
             mb.showerror(
-                "Error", "You can't do this your ships would be overlapping")
+                "Error", "You can't do this your simps would be overlapping")
         else:
             firstCoords = [x, y]  # set first coordiantes
-            # set coordinate blue to indicate start of simp/ship selection
+            # set coordinate blue to indicate start of simp selection
             yourGrid[x][y].configure(bg="blue")
 
 
 def lastButtonPress(x, y):
     global firstCoords
     if (firstCoords[0] == x and firstCoords[1] == y):  # if in same place as first press
-        # set to white as otherwise ship would be 1 long which is impossible
+        # set to white as otherwise simp would be 1 long which is impossible
         yourGrid[firstCoords[0]][firstCoords[1]].configure(bg="white")
         firstCoords = [-1, -1]  # reset firstCoords to prevent issues
 
-    # if spot already blue then prevent ship being placed as overlapping
+    # if spot already blue then prevent simp being placed as overlapping
     elif (yourGrid[x][y].cget("bg") == "blue"):
         mb.showerror(
-            "Error", "You can't do this your ships would be overlapping")
+            "Error", "You can't do this your simps would be overlapping")
         yourGrid[firstCoords[0]][firstCoords[1]].configure(bg="white")
         firstCoords = [-1, -1]
 
@@ -55,7 +53,7 @@ def lastButtonPress(x, y):
             firstCoordsAbove(x, y)
         else:  # it's more than 5 so we need to reset the firstcoords to white
             yourGrid[firstCoords[0]][firstCoords[1]].configure(bg="white")
-        # reset firstCoords to allow for new ship no matter what
+        # reset firstCoords to allow for new simp no matter what
         firstCoords = [-1, -1]
 
     elif (firstCoords[1] == y):  # if on same y coord as first button that was pressed
@@ -78,10 +76,14 @@ def lastButtonPress(x, y):
         firstCoords = [-1, -1]
 
 
+# Place simp logic
+
+
 def firstCoordsLeft(x, y):
     print("in firstCoordsLeft function")
     global firstCoords
     global overlap
+    global bIsSimpAvaliable
     # distance between the two and is less than 0 so has to be converted to a positive
     distance = -(firstCoords[0] - x)
     tempx = x
@@ -89,23 +91,38 @@ def firstCoordsLeft(x, y):
         tempx -= 1
         if(yourGrid[tempx][y].cget("bg") == "blue"):
             overlap = True
+    
+    for i in range(len(simps)):  # for each simp
+        if (distance+1 == simps[i]):
+            bIsSimpAvaliable = True
 
-    if (overlap == False): # if overlap == False 
+    if (overlap == False and bIsSimpAvaliable == True):
+        simps.remove(distance+1)
         for i in range(distance-1):  # loop the distance
             x -= 1
             yourGrid[x][y].configure(bg="blue")  # set blue
-    else:
+
+    elif (overlap == True):
         mb.showerror(
-            "Error", "You can't do this your ships would be overlapping")
+            "Error", "You can't do this your simps would be overlapping")
         yourGrid[firstCoords[0]][firstCoords[1]].configure(bg="white")
         yourGrid[x][y].configure(bg="white")
+
+    elif (bIsSimpAvaliable == False):
+        mb.showerror(
+            "Error", "You can't do this you've placed all the simps that are this length")
+        yourGrid[firstCoords[0]][firstCoords[1]].configure(bg="white")
+        yourGrid[x][y].configure(bg="white")
+
     overlap = False
+    bIsSimpAvaliable = False
 
 
 def firstCoordsAbove(x, y):
     print("in firstCoordsAbove function")
     global firstCoords
     global overlap
+    global bIsSimpAvaliable
     # distance between the two and is less than 0 so has to be converted to a positive
     distance = -(firstCoords[1] - y)
     tempy = y
@@ -114,23 +131,37 @@ def firstCoordsAbove(x, y):
         if(yourGrid[x][tempy].cget("bg") == "blue"):
             overlap = True
     
-    if (overlap == False):  # if overlap == False
+    for i in range(len(simps)):  # for each simp
+        if (distance+1 == simps[i]):
+            bIsSimpAvaliable = True
+
+    if (overlap == False and bIsSimpAvaliable == True):  # if overlap == False
+        simps.remove(distance+1)
         for i in range(distance-1):  # loop the distance
             y -= 1
             yourGrid[x][y].configure(bg="blue")  # set blue
     
-    else:
+    elif (overlap == True):
         mb.showerror(
-            "Error", "You can't do this your ships would be overlapping")
+            "Error", "You can't do this your simps would be overlapping")
         yourGrid[firstCoords[0]][firstCoords[1]].configure(bg="white")
         yourGrid[x][y].configure(bg="white")
+
+    elif (bIsSimpAvaliable == False):
+        mb.showerror(
+            "Error", "You can't do this you've placed all the simps that are this length")
+        yourGrid[firstCoords[0]][firstCoords[1]].configure(bg="white")
+        yourGrid[x][y].configure(bg="white")
+
     overlap = False
+    bIsSimpAvaliable = False
 
 
 def firstCoordsBelow(x, y):
     print("in firstCoordsBelow function")
     global firstCoords
     global overlap
+    global bIsSimpAvaliable
     # distance between the two and is greater than 0 :)
     distance = firstCoords[1] - y
     tempy = y
@@ -139,23 +170,37 @@ def firstCoordsBelow(x, y):
         if(yourGrid[x][tempy].cget("bg") == "blue"):
             overlap = True
 
-    if (overlap == False):  # if overlap == False
+    for i in range(len(simps)):  # for each simp
+        if (distance+1 == simps[i]):
+            bIsSimpAvaliable = True
+
+    if (overlap == False and bIsSimpAvaliable == True):  # if overlap == False
+        simps.remove(distance+1)
         for i in range(distance-1):  # loop the distance
             y += 1
             yourGrid[x][y].configure(bg="blue")  # set blue
 
-    else:
+    elif (overlap == True):
         mb.showerror(
-            "Error", "You can't do this your ships would be overlapping")
+            "Error", "You can't do this your simps would be overlapping")
         yourGrid[firstCoords[0]][firstCoords[1]].configure(bg="white")
         yourGrid[x][y].configure(bg="white")
+
+    elif (bIsSimpAvaliable == False):
+        mb.showerror(
+            "Error", "You can't do this you've placed all the simps that are this length")
+        yourGrid[firstCoords[0]][firstCoords[1]].configure(bg="white")
+        yourGrid[x][y].configure(bg="white")
+    
     overlap = False
+    bIsSimpAvaliable = False
 
 
 def firstCoordsRight(x, y):
     print("in firstCoordsRight function")
     global firstCoords
     global overlap
+    global bIsSimpAvaliable
     # distance between the two and is greater than 0 :)
     distance = firstCoords[0] - x
     tempx = x
@@ -164,18 +209,30 @@ def firstCoordsRight(x, y):
         if(yourGrid[tempx][y].cget("bg") == "blue"):
             overlap = True
     
-    if (overlap == False):  # if overlap == False
+    for i in range(len(simps)):  # for each simp
+        if (distance+1 == simps[i]):
+            bIsSimpAvaliable = True
+
+    if (overlap == False and bIsSimpAvaliable == True):  # if overlap == False
+        simps.remove(distance+1)
         for i in range(distance-1):  # loop the distance
             x += 1
             yourGrid[x][y].configure(bg="blue")  # set blue
 
-    else:
+    elif (overlap == True):
         mb.showerror(
-            "Error", "You can't do this your ships would be overlapping")
+            "Error", "You can't do this your simps would be overlapping")
         yourGrid[firstCoords[0]][firstCoords[1]].configure(bg="white")
         yourGrid[x][y].configure(bg="white")
-    overlap = False
 
+    elif (bIsSimpAvaliable == False):
+        mb.showerror(
+            "Error", "You can't do this you've placed all the simps that are this length")
+        yourGrid[firstCoords[0]][firstCoords[1]].configure(bg="white")
+        yourGrid[x][y].configure(bg="white")
+
+    overlap = False
+    bIsSimpAvaliable = False
 
 
 # Window creation etc
@@ -188,7 +245,7 @@ bottom = Frame(window)
 top.pack(side=TOP)
 bottom.pack(side=BOTTOM, expand=True)
 
-# the main battleships frame. relief = the style of the border for the frame
+# the main battlesimps frame. relief = the style of the border for the frame
 yourFrame = Frame(top, borderwidth=1, relief="solid", width=200, height=200)
 yourFrame.pack(in_=top, side=LEFT, padx=10, pady=10)  # pack it into the window
 
@@ -197,7 +254,7 @@ wLbl = Label(
 wLbl.pack(in_=top, side=LEFT)
 
 
-# the main battleships frame. relief = the style of the border for the frame
+# the main battlesimps frame. relief = the style of the border for the frame
 trackingFrame = Frame(top, borderwidth=1,
                       relief="solid", width=200, height=200)
 trackingFrame.pack(in_=top, side=RIGHT, padx=10,

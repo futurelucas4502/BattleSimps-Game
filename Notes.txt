@@ -1,4 +1,12 @@
+* Initial ship placement complete
+* Check length of placement
+* Check if middle parts of ships overlap other ships
+* Remove simps from simps array
 
+TODO:
+
+* Build random number generator with some logic for AI
+* Build scoring system
 
 
 https://github.com/futurelucas4502/BattleSimps-Game
