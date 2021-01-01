@@ -1,5 +1,6 @@
 from tkinter import *  # importing the gui library
 import tkinter.messagebox as mb
+import os, sys
 
 # Main user logic
 
@@ -74,7 +75,8 @@ def lastButtonPress(x, y):
         mb.showerror("Error", "You can't place simps diagonally!")
         yourGrid[firstCoords[0]][firstCoords[1]].configure(bg="white")
         firstCoords = [-1, -1]
-
+    if(len(simps) == 0):
+        gameReady()
 
 # Place simp logic
 
@@ -233,6 +235,22 @@ def firstCoordsRight(x, y):
 
     overlap = False
     bIsSimpAvaliable = False
+
+# User game setup complete
+def gameReady():
+    if(not mb.askyesno('Start', 'Ready to start?')):
+        if(mb.askyesno('Reset', 'Would you like to reset?')):
+            os.execl(sys.executable, 'python',
+                     '"{}"'.format(__file__), *sys.argv[1:])
+        else:
+            gameReady()
+    else:
+        setup()
+
+
+
+def setup():
+    pass
 
 
 # Window creation etc
